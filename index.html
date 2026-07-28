@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume Matcher & Skill Gap Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero-panel">
+      <div class="hero-copy">
+        <p class="eyebrow">Resume Analysis Tool</p>
+        <h1>Resume Matcher & Skill Gap Analyzer</h1>
+        <p class="hero-copy-text">A premium career analysis dashboard that compares your resume and job description, reveals fit, and recommends ATS-ready bullet rewrites — locally.</p>
+        <div class="status-badges">
+          <span class="status-pill status-pill-info">ATS-ready</span>
+          <span class="status-pill status-pill-success">No API needed</span>
+          <span class="status-pill status-pill-muted">Runs locally</span>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <button id="clearBtn" class="button tertiary">Clear</button>
+        <button id="sampleFrontendBtn" class="button secondary">Frontend sample</button>
+        <button id="sampleDataBtn" class="button secondary">Data sample</button>
+        <button id="sampleBackendBtn" class="button secondary">Backend sample</button>
+      </div>
+    </header>
+
+    <div class="input-grid">
+      <section class="panel panel-input glass-panel">
+        <div class="panel-heading panel-heading-icon">
+          <div>
+            <h2>Resume text</h2>
+            <p>Paste your resume or CV here. Strong results and action verbs improve the analysis.</p>
+          </div>
+          <span class="panel-icon">📝</span>
+        </div>
+        <textarea id="resumeText" rows="14" placeholder="Paste your resume or CV here..."></textarea>
+        <div class="input-meta">
+          <span id="resumeWordCount">0 words</span>
+          <span id="resumeCharCount">0 chars</span>
+        </div>
+      </section>
+
+      <section class="panel panel-input glass-panel">
+        <div class="panel-heading panel-heading-icon">
+          <div>
+            <h2>Job description</h2>
+            <p>Paste the job description for the role you want to compare against.</p>
+          </div>
+          <span class="panel-icon">💼</span>
+        </div>
+        <textarea id="jobText" rows="14" placeholder="Paste the job description here..."></textarea>
+        <div class="input-meta">
+          <span id="jobWordCount">0 words</span>
+          <span id="jobCharCount">0 chars</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="control-row">
+      <div class="button-row">
+        <button id="analyzeBtn" class="button primary">Analyze</button>
+        <button id="exportBtn" class="button secondary" disabled>Download report</button>
+      </div>
+      <div id="message" class="message hidden"></div>
+    </div>
+
+    <section id="resultsPanel" class="results-panel">
+      <div id="resultsPlaceholder" class="results-placeholder">
+        <div class="placeholder-card">
+          <div class="placeholder-icon">📊</div>
+          <h3>Paste your resume and a job description to generate your match report.</h3>
+          <p>Use the analysis panel to uncover skill gaps, keyword alignment, ATS rewrite bullets, and personalized career recommendations.</p>
+        </div>
+      </div>
+
+      <div id="resultsContent" class="results-content hidden">
+        <div class="results-overview">
+          <div class="card summary-card summary-glow">
+            <span class="summary-label">Overall match</span>
+            <div class="score-row">
+              <div class="score-ring-wrapper">
+                <div class="score-ring">
+                  <span id="matchScore">0%</span>
+                </div>
+                <div class="score-ring-glow"></div>
+              </div>
+              <span id="readinessLevel" class="status-badge status-neutral">Needs improvement</span>
+            </div>
+            <p id="readinessText" class="summary-text">Paste resume and job text, then click analyze to reveal strength and action items.</p>
+            <div class="quick-stats">
+              <div class="stat-card">
+                <span>Matched skills</span>
+                <strong id="skillSummary">0 of 0</strong>
+              </div>
+              <div class="stat-card">
+                <span>Important keywords</span>
+                <strong id="keywordSummary">0 of 0</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card breakdown-card">
+            <h3>Score breakdown</h3>
+            <div class="breakdown-grid">
+              <div class="mini-card">
+                <span>Skill Match</span>
+                <strong id="skillMatchScore">0%</strong>
+                <div class="progress-bar"><span id="skillMatchBar" style="width: 0%"></span></div>
+              </div>
+              <div class="mini-card">
+                <span>Keyword Match</span>
+                <strong id="keywordMatchScore">0%</strong>
+                <div class="progress-bar"><span id="keywordMatchBar" style="width: 0%"></span></div>
+              </div>
+              <div class="mini-card">
+                <span>Text Similarity</span>
+                <strong id="textSimilarityScore">0%</strong>
+                <div class="progress-bar"><span id="textSimilarityBar" style="width: 0%"></span></div>
+              </div>
+              <div class="mini-card">
+                <span>Experience Match</span>
+                <strong id="actionMatchScore">0%</strong>
+                <div class="progress-bar"><span id="actionMatchBar" style="width: 0%"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-grid">
+          <div class="card quality-card">
+            <h3>Resume quality checks</h3>
+            <ul id="qualityList" class="checklist"></ul>
+          </div>
+
+          <div class="card skills-card">
+            <h3>Skill categories</h3>
+            <div id="categorySummary" class="category-summary"></div>
+          </div>
+        </div>
+
+        <div class="results-grid">
+          <div class="card keyword-card">
+            <h3>Top job keywords</h3>
+            <div class="table-scroll">
+              <table class="keyword-table">
+                <thead>
+                  <tr>
+                    <th>Keyword</th>
+                    <th>Job</th>
+                    <th>Resume</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="keywordTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card suggestions-card">
+            <h3>Improvement suggestions</h3>
+            <ul id="suggestionsList" class="suggestions-list"></ul>
+          </div>
+        </div>
+
+        <div class="results-grid">
+          <div class="card ats-card">
+            <div class="ats-header">
+              <div>
+                <h3>ATS Rewrite Assistant</h3>
+                <p class="ats-subtitle">Suggested resume bullets tailored to this job description.</p>
+              </div>
+              <button id="copyAllBulletsBtn" class="button secondary">Copy All</button>
+            </div>
+            <div id="bulletList" class="bullet-list"></div>
+            <div class="warning-box">Use only bullets that truthfully match your experience.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">Built as a polished portfolio project using HTML, CSS, and JavaScript.</footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
